@@ -6,8 +6,9 @@ open directory & cmake configure & cmake build, using vs code with cmake plugin 
 
 ## Usage
 
-- Run Quicklinks.exe (with config.json in same dir)
-- Pin Quicklinks.exe in taskbar, and right click the icon in taskbar.
+- Run Quicklinks.exe (with config.json in same directory)
+- Pin Quicklinks.exe in frist/or other position of taskbar, and set as "action":"show" in config.json
+- Right click the icon in taskbar, or WIN+1
 
 ## Screen 
 

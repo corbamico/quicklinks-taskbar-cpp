@@ -1,5 +1,4 @@
 #include "pch.h"
-#include <iostream>
 using namespace winrt;
 using namespace winrt::Windows::Foundation;
 using json = nlohmann::json;
@@ -14,8 +13,10 @@ namespace ns {
 
     struct Config
     {
-        std::string category;
+        //std::string category;
         std::vector<Item> items;
+        std::string action;
+        u_short iconInTaskbar;
     };
 
     void from_json(const json& j, Item& p)
@@ -27,8 +28,10 @@ namespace ns {
 
     void from_json(const json& j, Config& p)
     {
-        j.at("category").get_to(p.category);
+        //j.at("category").get_to(p.category);
         j.at("items").get_to(p.items);
+        j.at("action").get_to(p.action);
+        j.at("iconInTaskbar").get_to(p.iconInTaskbar);        
     }
 }
 
@@ -62,10 +65,29 @@ public:
         }
 
         auto objectArray = objectCollection.try_query<IObjectArray>();
-        customDestinationList->AppendCategory(string_to_w(config.category).c_str(), objectArray.get());
-
-        return customDestinationList->CommitList();
+        auto hr = customDestinationList->AddUserTasks(objectArray.get());
+        customDestinationList->CommitList();
+        return hr;
     }
+    void ShowMenu(u_short nth)
+    {
+        POINT pt = GetTaskBarPoint(nth);
+        POINT ptCur{};
+
+        GetCursorPos(&ptCur);
+        ShowCursor(FALSE);
+        SetCursorPos(pt.x, pt.y);
+
+        INPUT inputs[2] = {};
+        inputs[0].type = INPUT_MOUSE;
+        inputs[0].mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+        inputs[1].type = INPUT_MOUSE;
+        inputs[1].mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+
+        SendInput(2, inputs, sizeof(INPUT));
+        SetCursorPos(ptCur.x, ptCur.y);
+        ShowCursor(TRUE);
+    }    
 private:
     HRESULT AddTaskToCollection(IObjectCollection *collection, LPCWSTR title, LPCWSTR appPath, LPCWSTR args)
     {
@@ -87,6 +109,18 @@ private:
     {
         return std::wstring(str.begin(), str.end());
     }
+    // https://windhawk.net/mods/taskbar-icon-size
+    // Icon size: 24x24, taskbar height: 48 (Windows 11 default)
+    // width each Icon edge = 44, edge of first = 10
+    POINT GetTaskBarPoint(u_short nth)
+    {
+        APPBARDATA abd = {sizeof(APPBARDATA)};
+        UINT position = SHAppBarMessage(ABM_GETTASKBARPOS, &abd);
+        if (abd.uEdge == ABE_TOP || abd.uEdge == ABE_BOTTOM)
+            return POINT{abd.rc.left + (10 + 22 + 44 * nth), abd.rc.top + 24};
+        else
+            return POINT{abd.rc.left + 24, abd.rc.top + (10 + 22 + 44 * nth)};
+    }    
 };
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -96,12 +130,13 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     if (f.is_open())
     {
         json data = json::parse(f,nullptr,false);
-        //MessageBox(nullptr,data.dump().c_str(),nullptr,MB_OK);
-        //std::cout << data.dump();
         if(!data.is_null())
         {
             ns::Config config = data.get<ns::Config>();
-            
+            if(config.action.compare("show")==0){
+                eng.ShowMenu(config.iconInTaskbar);
+                return 0;
+            }            
             HRESULT hr = eng.CreateJumpList(config);
             if(S_OK == hr){
                 MessageBox(nullptr,L"Successfully updated shortcuts",L"Shortcuts",MB_OK|MB_ICONINFORMATION);

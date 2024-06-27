@@ -1,8 +1,15 @@
 {
-    "category":"Quick Links",
     "items":[
         {"title":"calc","path":"calc.exe","args":""},
         {"title":"notepad","path":"notepad.exe","args":""},
-        {"title":"livecaptions","path":"livecaptions.exe","args":""}
-    ]
+        {"title":"livecaptions","path":"livecaptions.exe","args":""},
+        {"title":"msedge","path":"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe","args":""},
+        {"title":"Terminal","path":"C:\\Program Files\\WindowsApps\\Microsoft.WindowsTerminal_1.20.11381.0_x64__8wekyb3d8bbwe\\wt.exe","args":""},
+        {"title":"SnippingTool","path":"C:\\Program Files\\WindowsApps\\Microsoft.ScreenSketch_11.2405.32.0_x64__8wekyb3d8bbwe\\SnippingTool\\SnippingTool.exe","args":""},
+        {"title":"everything","path":"C:\\Program Files\\Everything\\Everything.exe","args":""},
+        {"title":"chrome","path":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe","args":""}
+        
+    ],
+    "action":"register",
+    "iconInTaskbar":3    
 }
