@@ -1,0 +1,8 @@
+{
+    "category":"Quick Links",
+    "items":[
+        {"title":"calc","path":"calc.exe","args":""},
+        {"title":"notepad","path":"notepad.exe","args":""},
+        {"title":"livecaptions","path":"livecaptions.exe","args":""}
+    ]
+}
