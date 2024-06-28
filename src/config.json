@@ -10,6 +10,5 @@
         {"title":"chrome","path":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe","args":""}
         
     ],
-    "action":"register",
     "iconInTaskbar":3    
 }

@@ -1,0 +1,10 @@
+Checks: >
+  -*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  clang-analyzer-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -readability-identifier-length

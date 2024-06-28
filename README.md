@@ -4,15 +4,34 @@ Create Quick Links/Shortcut in Taskbar for windows 11, you can define your links
 ## Compile 
 open directory & cmake configure & cmake build, using vs code with cmake plugin and VS Build Tools 2022 installed.
 
+you should use cmake of MS VS Build Tools 2022, it is normally at 
+
+```cmd
+"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+```
+
+Compile as following
+
+```cmd
+cmake -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake -S. -Bbuilds/vs-multi-vcpkg -G "Ninja Multi-Config"
+
+cmake.exe --build builds/vs-multi-vcpkg --config Debug --target quicklinks
+```
+
 ## Usage
 
 - Run Quicklinks.exe (with config.json in same directory)
-- Pin Quicklinks.exe in frist/or other position of taskbar, and set as "action":"show" in config.json
-- Right click the icon in taskbar, or WIN+1
+- Pin Quicklinks.exe in frist/or other position of taskbar
+- Right click the icon in taskbar, or WIN+\<number>
 
 ## Screen 
 
 ![screen](./docs/image.png)
+
+## KnownIssue
+
+- WIN+\<number> does not work well, if the taskbar alignment is centered.
+- WIN+\<number> does not work well, if secondary monitor.
 
 ## License
 

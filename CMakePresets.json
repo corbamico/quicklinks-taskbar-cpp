@@ -11,7 +11,7 @@
             "displayName": "vsbuild Multi-Config",
             "description": "Configure with vcpkg toolchain and generate vs project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Visual Studio 17 2022",
+            "generator": "Ninja Multi-Config",
             "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
         }
     ],
