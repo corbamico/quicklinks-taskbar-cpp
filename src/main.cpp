@@ -28,16 +28,21 @@ namespace ns
     void from_json(const json &j, Config &p)
     {
         j.at("items").get_to(p.items);
-        j.at("iconInTaskbar").get_to(p.iconInTaskbar);
+        //j.at("iconInTaskbar").get_to(p.iconInTaskbar);
     }
 }
 
 class Engine
 {
+    winrt::com_ptr<IUIAutomation> _automation;
+    winrt::com_ptr<IUIAutomationCondition> _condition;    
 public:
     Engine()
     {
         winrt::init_apartment();
+        _automation = try_create_instance<IUIAutomation>(guid_of<CUIAutomation>());
+        _automation->CreatePropertyCondition(UIA_NamePropertyId, wil::make_variant_bstr(L"quicklinks"), _condition.put());
+
     }
     ~Engine() { winrt::uninit_apartment(); }
     Engine(const Engine &) = delete;
@@ -70,27 +75,6 @@ public:
         customDestinationList->CommitList();
         return hr;
     }
-    static void ShowMenu(u_short nth)
-    {
-        POINT pt = GetTaskBarPoint(nth);
-        POINT ptCur{};
-
-        GetCursorPos(&ptCur);
-        ShowCursor(FALSE);
-        SetCursorPos(pt.x, pt.y);
-
-        //std::array<INPUT, 2> inputs{};
-        INPUT inputs[2] = {}; //NOLINT
-        inputs[0].type = INPUT_MOUSE;
-        inputs[0].mi.dwFlags = MOUSEEVENTF_RIGHTDOWN; //NOLINT
-        inputs[1].type = INPUT_MOUSE;
-        inputs[1].mi.dwFlags = MOUSEEVENTF_RIGHTUP; //NOLINT
-
-        SendInput(2, inputs, sizeof(INPUT));        //NOLINT
-        //SendInput(2, inputs.data(), inputs.size());
-        SetCursorPos(ptCur.x, ptCur.y);
-        ShowCursor(TRUE);
-    }
 
     static bool ConfigChanged(const json &jsonConfig)
     {
@@ -119,6 +103,24 @@ public:
         }
         return changed;
     }
+    void ShowContextMenu()
+    {
+        winrt::com_ptr<IUIAutomationElement> window_element;
+        winrt::com_ptr<IUIAutomationElement> button_element;
+
+        try{
+            auto window = FindWindowW(L"Shell_TrayWnd", nullptr);
+            winrt::check_hresult(_automation->ElementFromHandle(window, window_element.put()));            
+            
+            winrt::check_hresult(window_element->FindFirst(TreeScope_Descendants, _condition.get(), button_element.put()));
+            if (button_element)
+            {
+                button_element.as<IUIAutomationElement3>()->ShowContextMenu();
+            }
+        }
+        catch (winrt::hresult_error &e){}
+        catch (std::exception &e){}         
+    }
 
 private:
     // NOLINTNEXTLINE(readability-function-cognitive-complexity,bugprone-easily-swappable-parameters)
@@ -142,24 +144,6 @@ private:
     {
         return {str.begin(), str.end()};
     }
-    // https://windhawk.net/mods/taskbar-icon-size
-    // Icon size: 24x24, taskbar height: 48 (Windows 11 default)
-    // width each Icon edge = 44, edge of first = 10
-    static POINT GetTaskBarPoint(u_short nth)
-    {
-        POINT value{};
-        APPBARDATA abd = {sizeof(APPBARDATA)};
-        SHAppBarMessage(ABM_GETTASKBARPOS, &abd);
-        if (abd.uEdge == ABE_TOP || abd.uEdge == ABE_BOTTOM)
-        {
-            value = POINT{(abd.rc.left + (10 + 22 + 44 * nth)), (abd.rc.top + 24)}; // NOLINT
-        }
-        else
-        {
-            value = POINT{(abd.rc.left + 24), (abd.rc.top + (10 + 22 + 44 * nth))}; // NOLINT
-        }
-        return value;
-    }
 };
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -175,8 +159,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             ns::Config config = data.get<ns::Config>();
             if (!Engine::ConfigChanged(data))
             {
-                // if no changed, show menu
-                Engine::ShowMenu(config.iconInTaskbar);
+                // if no changed, show context menu
+                eng.ShowContextMenu();
             }
             else
             {

@@ -9,6 +9,5 @@
         {"title":"everything","path":"C:\\Program Files\\Everything\\Everything.exe","args":""},
         {"title":"chrome","path":"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe","args":""}
         
-    ],
-    "iconInTaskbar":3    
+    ]
 }

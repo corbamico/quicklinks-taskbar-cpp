@@ -1,5 +1,5 @@
 # quicklinks-taskbar-cpp
-Create Quick Links/Shortcut in Taskbar for windows 11, you can define your links/shortcut in config.json, cpp coding with cppwinrt/wil/jumplist
+Create Quick Links/Shortcuts in Taskbar for windows 11, you can define your links/shortcut in config.json, cpp coding with cppwinrt/wil/IUIAutomation/jumplist
 
 ## Compile 
 open directory & cmake configure & cmake build, using vs code with cmake plugin and VS Build Tools 2022 installed.
@@ -21,17 +21,12 @@ cmake.exe --build builds/vs-multi-vcpkg --config Debug --target quicklinks
 ## Usage
 
 - Run Quicklinks.exe (with config.json in same directory)
-- Pin Quicklinks.exe in frist/or other position of taskbar
-- Right click the icon in taskbar, or WIN+\<number>
+- Pin Quicklinks.exe in taskbar
+- Right/or left click the icon in taskbar, or WIN+\<number>
 
 ## Screen 
 
 ![screen](./docs/image.png)
-
-## KnownIssue
-
-- WIN+\<number> does not work well, if the taskbar alignment is centered.
-- WIN+\<number> does not work well, if secondary monitor.
 
 ## License
 
