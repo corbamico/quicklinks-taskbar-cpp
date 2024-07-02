@@ -137,25 +137,25 @@ public:
                 BOOL  clickable;                
                 button_element->GetClickablePoint(&pt,&clickable);
                 INPUT inputs[2];
-                // 将坐标转换为标准化值
+                //
                 int normalizedX = pt.x * 0xFFFF  / GetSystemMetrics(SM_CXSCREEN);
                 int normalizedY = pt.y * 0xFFFF  / GetSystemMetrics(SM_CYSCREEN);
 
                 GetCursorPos(&ptCurrent);
 
-                // 设置鼠标按下事件
+                //
                 inputs[0].type = INPUT_MOUSE;
                 inputs[0].mi.dx = normalizedX;
                 inputs[0].mi.dy = normalizedY;
                 inputs[0].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_MOVE;
 
-                // 设置鼠标释放事件
+                //
                 inputs[1].type = INPUT_MOUSE;
                 inputs[1].mi.dx = normalizedX;
                 inputs[1].mi.dy = normalizedY;
                 inputs[1].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTUP;
 
-                // 发送输入事件
+                //
                 SendInput(2, inputs, sizeof(INPUT));
 
                 SetCursorPos(ptCurrent.x, ptCurrent.y);
