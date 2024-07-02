@@ -103,7 +103,25 @@ public:
         }
         return changed;
     }
-    void ShowContextMenu()
+    // void ShowContextMenu()
+    // {
+    //     winrt::com_ptr<IUIAutomationElement> window_element;
+    //     winrt::com_ptr<IUIAutomationElement> button_element;
+
+    //     try{
+    //         auto window = FindWindowW(L"Shell_TrayWnd", nullptr);
+    //         winrt::check_hresult(_automation->ElementFromHandle(window, window_element.put()));            
+            
+    //         winrt::check_hresult(window_element->FindFirst(TreeScope_Descendants, _condition.get(), button_element.put()));
+    //         if (button_element)
+    //         {
+    //             button_element.as<IUIAutomationElement3>()->ShowContextMenu();
+    //         }
+    //     }
+    //     catch (winrt::hresult_error &e){}
+    //     catch (std::exception &e){}         
+    // }
+    void ShowMenuOnIcon()
     {
         winrt::com_ptr<IUIAutomationElement> window_element;
         winrt::com_ptr<IUIAutomationElement> button_element;
@@ -115,11 +133,36 @@ public:
             winrt::check_hresult(window_element->FindFirst(TreeScope_Descendants, _condition.get(), button_element.put()));
             if (button_element)
             {
-                button_element.as<IUIAutomationElement3>()->ShowContextMenu();
+                POINT pt,ptCurrent;
+                BOOL  clickable;                
+                button_element->GetClickablePoint(&pt,&clickable);
+                INPUT inputs[2];
+                // 将坐标转换为标准化值
+                int normalizedX = pt.x * 0xFFFF  / GetSystemMetrics(SM_CXSCREEN);
+                int normalizedY = pt.y * 0xFFFF  / GetSystemMetrics(SM_CYSCREEN);
+
+                GetCursorPos(&ptCurrent);
+
+                // 设置鼠标按下事件
+                inputs[0].type = INPUT_MOUSE;
+                inputs[0].mi.dx = normalizedX;
+                inputs[0].mi.dy = normalizedY;
+                inputs[0].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_MOVE;
+
+                // 设置鼠标释放事件
+                inputs[1].type = INPUT_MOUSE;
+                inputs[1].mi.dx = normalizedX;
+                inputs[1].mi.dy = normalizedY;
+                inputs[1].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTUP;
+
+                // 发送输入事件
+                SendInput(2, inputs, sizeof(INPUT));
+
+                SetCursorPos(ptCurrent.x, ptCurrent.y);
             }
         }
         catch (winrt::hresult_error &e){}
-        catch (std::exception &e){}         
+        catch (std::exception &e){}        
     }
 
 private:
@@ -160,7 +203,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             if (!Engine::ConfigChanged(data))
             {
                 // if no changed, show context menu
-                eng.ShowContextMenu();
+                eng.ShowMenuOnIcon();
             }
             else
             {
